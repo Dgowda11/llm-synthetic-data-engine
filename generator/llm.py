@@ -1,4 +1,4 @@
-import config
+import settings 
 from openai import OpenAI
 
 from openai import(
@@ -23,7 +23,7 @@ class LLMClient:
         self.max_tokens = max_tokens
         if max_tokens <= 0:
             raise ValueError("Max tokens must be a positive integer.")
-        self.client = OpenAI(api_key=config.get_required_env('OPENROUTER_API_KEY'), base_url='https://openrouter.ai/api/v1', timeout=30)
+        self.client = OpenAI(api_key=settings.get_required_env('OPENROUTER_API_KEY'), base_url='https://openrouter.ai/api/v1', timeout=30)
         
 
     def generate(self,prompt: str) -> str:
@@ -63,7 +63,7 @@ class LLMClient:
 
 if __name__ == "__main__":
     prompt = "Hey there! Can you tell me a joke?"
-    llm_client = LLMClient(model=config.get_required_env('OPENROUTER_MODEL'))
+    llm_client = LLMClient(model=settings.get_required_env('OPENROUTER_MODEL'))
     try:
         response = llm_client.generate(prompt)
         print("Response from LLM:", response)
