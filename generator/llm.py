@@ -11,10 +11,9 @@ from openai import(
 
 class LLMClient:
     def __init__(self,
-                 model:str,
                  temperature:float=1,
                  max_tokens:int=1000,) -> None:
-        self.model = model.strip()
+        self.model = settings.get_required_env('OPENROUTER_MODEL')
         if not self.model:
             raise ValueError("Model name cannot be empty.")
         self.temperature = temperature
@@ -60,13 +59,4 @@ class LLMClient:
         if response_text is None or response_text.strip() == "":
             raise ValueError("The model returned an empty response.")
         return response_text.strip()
-
-if __name__ == "__main__":
-    prompt = "Hey there! Can you tell me a joke?"
-    llm_client = LLMClient(model=settings.get_required_env('OPENROUTER_MODEL'))
-    try:
-        response = llm_client.generate(prompt)
-        print("Response from LLM:", response)
-    except Exception as e:
-        print(f"Error generating response: {e}")
 
