@@ -10,7 +10,7 @@ Generate INVEST-compliant User Stories.
 
 Generate User Stories for the provided Feature.
 
-Generate **5–10 User Stories**.
+Generate exactly **$story_count User Stories**.
 
 Each User Story must include Acceptance Criteria.
 

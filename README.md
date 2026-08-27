@@ -177,12 +177,13 @@ Create a `.env` file in the project root.
 
 ```env
 OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_MODEL=your_openrouter_model
 
 AZURE_DEVOPS_ORG=https://dev.azure.com/your-organization
 
-AZURE_DEVOPS_PROJECT=YourProject
-
 AZURE_DEVOPS_PAT=your_personal_access_token
+
+AZURE_DEVOPS_PROCESS_TEMPLATE_ID=your_process_template_id
 ```
 
 ---
@@ -193,6 +194,10 @@ AZURE_DEVOPS_PAT=your_personal_access_token
 python app.py
 ```
 
+Project and work-item creation requires an Azure DevOps PAT with the
+`vso.project_manage` and `vso.work_write` scopes. All generated artifacts are
+saved under `output/` before the Azure DevOps project creation request is sent.
+
 Example:
 
 ```text
@@ -202,6 +207,11 @@ Insurance Claim Processing
 ```
 
 The application will generate synthetic Azure DevOps artifacts and save them as JSON files.
+
+The default E2E dataset generates 2 Epics, 2 Features per Epic, 2 User
+Stories per Feature, and at least 3 Test Cases per Story. These counts are
+constructor options on `SyntheticDataEngine` and can be increased after the
+small vertical slice is working reliably with your selected model and limits.
 
 ---
 
@@ -219,7 +229,7 @@ output/
 ├── features.json
 ├── stories.json
 ├── acceptance_criteria.json
-├── test_cases.json
+├── testcases.json
 ├── bugs.json
 └── traceability.json
 ```
@@ -241,6 +251,22 @@ The import process follows this order:
 7. Work Item Relationships
 
 This ensures parent-child relationships are maintained correctly.
+
+The Azure DevOps project is the container. Inside it, work items are uploaded
+in this hierarchy:
+
+```text
+Epic
+└── Feature
+      └── User Story
+            └── Test Case
+                  └── Bug
+```
+
+Acceptance criteria are stored on their User Story and also exported to
+`output/acceptance_criteria.json`. Test Cases receive both a parent link and
+Azure DevOps' native Tests link to their User Story. The synthetic-to-Azure ID
+mapping is saved to `output/azure_upload.json`.
 
 ---
 

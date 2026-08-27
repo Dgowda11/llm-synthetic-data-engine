@@ -12,7 +12,7 @@ Generate a list of synthetic Epics for the provided software project.
 
 Each Epic should represent a major business capability and should be independent, meaningful, and suitable for further decomposition into Features.
 
-Generate **5–8 Epics**.
+Generate exactly **$epic_count Epics**.
 
 ---
 
@@ -40,7 +40,7 @@ $objectives
 - Do not include Markdown.
 - Do not include explanations.
 - Do not include comments.
-- Generate between 5 and 8 Epics.
+- Generate exactly $epic_count Epics.
 
 ---
 

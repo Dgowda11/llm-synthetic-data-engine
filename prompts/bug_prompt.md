@@ -8,7 +8,7 @@ You are an experienced QA Lead responsible for documenting realistic software de
 
 Generate realistic Bugs based on failed manual test cases.
 
-Generate **1–3 Bugs** if defects are plausible.
+Generate exactly **$bug_count Bugs** when defects are plausible.
 
 ---
 
@@ -50,6 +50,8 @@ $actual_result
 - No Markdown.
 - No explanations.
 - No comments.
+- Use the supplied Story ID and Test Case ID exactly.
+- Return {"bugs": []} only when the actual result does not describe a defect.
 
 ---
 

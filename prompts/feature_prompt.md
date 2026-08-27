@@ -10,7 +10,7 @@ Generate Features for the given Epic.
 
 Each Feature should represent a functional capability belonging to the Epic.
 
-Generate **3–6 Features**.
+Generate exactly **$feature_count Features**.
 
 ---
 

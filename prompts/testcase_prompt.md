@@ -10,6 +10,8 @@ Generate manual test cases that completely cover the provided User Story and its
 
 Generate positive, negative, and boundary test cases.
 
+Generate exactly **$test_case_count Test Cases**.
+
 ---
 
 # Input Context
@@ -38,6 +40,7 @@ $acceptance_criteria
 - No Markdown.
 - No explanations.
 - Every Acceptance Criterion must be covered by at least one test case.
+- Copy the covered Acceptance Criterion exactly into each test case's acceptance_criteria field.
 
 ---
 

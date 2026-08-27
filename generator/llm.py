@@ -12,7 +12,7 @@ from openai import(
 class LLMClient:
     def __init__(self,
                  temperature:float=1,
-                 max_tokens:int=1000,) -> None:
+                 max_tokens:int=4000,) -> None:
         self.model = settings.get_required_env('OPENROUTER_MODEL')
         if not self.model:
             raise ValueError("Model name cannot be empty.")
@@ -25,7 +25,7 @@ class LLMClient:
         self.client = OpenAI(api_key=settings.get_required_env('OPENROUTER_API_KEY'), base_url='https://openrouter.ai/api/v1', timeout=30)
         
 
-    def generate(self,prompt: str) -> str:
+    def generate(self, prompt: str, json_output: bool = False) -> str:
         """
         Generate text using the LLM model """
         cleaned_prompt = prompt.strip()
@@ -34,11 +34,31 @@ class LLMClient:
         # Get the API key from the config module
         gpt = self.client
         try:
-            response = gpt.chat.completions.create(
-            model=self.model,
-            temperature=self.temperature,
-            max_tokens=self.max_tokens,
-            messages=[{"role": "user", "content": cleaned_prompt}],)
+            if json_output:
+                try:
+                    response = gpt.chat.completions.create(
+                        model=self.model,
+                        temperature=self.temperature,
+                        max_tokens=self.max_tokens,
+                        messages=[{"role": "user", "content": cleaned_prompt}],
+                        response_format={"type": "json_object"},
+                    )
+                except APIStatusError as error:
+                    if error.status_code not in {400, 422}:
+                        raise
+                    response = gpt.chat.completions.create(
+                        model=self.model,
+                        temperature=self.temperature,
+                        max_tokens=self.max_tokens,
+                        messages=[{"role": "user", "content": cleaned_prompt}],
+                    )
+            else:
+                response = gpt.chat.completions.create(
+                    model=self.model,
+                    temperature=self.temperature,
+                    max_tokens=self.max_tokens,
+                    messages=[{"role": "user", "content": cleaned_prompt}],
+                )
         except AuthenticationError as e:
             raise RuntimeError(f"Authentication error: {e}") from e
 
@@ -55,6 +75,10 @@ class LLMClient:
             raise RuntimeError(
                 f"API status error ({e.status_code}): {e}"
             ) from e
+        if response.choices[0].finish_reason == "length":
+            raise RuntimeError(
+                "The model response was truncated because it reached the token limit."
+            )
         response_text =  response.choices[0].message.content
         if response_text is None or response_text.strip() == "":
             raise ValueError("The model returned an empty response.")
