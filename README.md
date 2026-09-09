@@ -22,7 +22,7 @@ The generator accepts a **business domain** (for example, Banking, Insurance, He
 User Input (Business Domain)
             │
             ▼
-      OpenRouter LLM
+            NVIDIA NIM LLM
             │
             ▼
  Generate Azure DevOps Artifacts
@@ -114,8 +114,8 @@ SyntheticAzureDevOpsGenerator/
 | Component         | Technology                             |
 | ----------------- | -------------------------------------- |
 | Language          | Python                                 |
-| LLM Provider      | OpenRouter                             |
-| LLM Models        | OpenAI, Anthropic, Google Gemini, etc. |
+| LLM Provider      | NVIDIA NIM (OpenRouter optional)       |
+| LLM Models        | NVIDIA-hosted open models              |
 | HTTP Client       | requests                               |
 | Configuration     | python-dotenv                          |
 | Data Validation   | Pydantic                               |
@@ -127,7 +127,7 @@ SyntheticAzureDevOpsGenerator/
 # Prerequisites
 
 * Python 3.12 or later
-* OpenRouter API Key
+* NVIDIA API Key
 * Azure DevOps Personal Access Token (PAT)
 * Azure DevOps Organization
 * Azure DevOps Project (or permissions to create one)
@@ -176,6 +176,12 @@ pip install -r requirements.txt
 Create a `.env` file in the project root.
 
 ```env
+LLM_PROVIDER=nvidia
+NVIDIA_API_KEY=your_nvidia_api_key
+NVIDIA_BASE_URL=https://integrate.api.nvidia.com/v1
+NVIDIA_MODEL=meta/llama-3.3-70b-instruct
+
+# Optional OpenRouter fallback configuration
 OPENROUTER_API_KEY=your_openrouter_api_key
 OPENROUTER_MODEL=your_openrouter_model
 
@@ -212,6 +218,12 @@ The default E2E dataset generates 2 Epics, 2 Features per Epic, 2 User
 Stories per Feature, and at least 3 Test Cases per Story. These counts are
 constructor options on `SyntheticDataEngine` and can be increased after the
 small vertical slice is working reliably with your selected model and limits.
+
+Every LLM response is parsed into a strict Pydantic model. Invalid fields,
+types, enum values, collection counts, or acceptance-criteria coverage trigger
+a bounded correction request. The complete dataset is validated again for
+unique IDs and parent-child references before any file is saved or Azure API
+write is attempted.
 
 ---
 
@@ -272,7 +284,7 @@ mapping is saved to `output/azure_upload.json`.
 
 # Future Roadmap
 
-* Support multiple LLM providers
+* Support additional LLM providers
 * Configurable project sizes (Small, Medium, Large)
 * Multiple business domain templates
 * Validation of generated artifacts

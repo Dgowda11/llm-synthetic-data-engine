@@ -1,6 +1,7 @@
 from generator.llm import LLMClient
+from generator.validation import generate_validated
+from models import Project
 from utils.prompt_loader import load_prompt
-from utils.helpers import parse_json_object, require_string, require_string_list
 
 class ProjectGenerator:
     def __init__(self, llm_client: LLMClient) -> None:
@@ -14,14 +15,25 @@ class ProjectGenerator:
         if not cleaned_domain:
             raise ValueError("Domain cannot be empty.")
         prompt_template = load_prompt("project", domain=cleaned_domain)
-        response = self.llm_client.generate(prompt_template, json_output=True)
-        project = parse_json_object(response, "project")
-        require_string(project, "name", "Project")
-        require_string(project, "description", "Project")
-        require_string_list(project, "objectives", "Project")
-        require_string_list(project, "success_criteria", "Project")
+        validated = generate_validated(
+            self.llm_client,
+            prompt_template,
+            Project,
+            "project",
+            semantic_validator=lambda project: _validate_domain(
+                project, cleaned_domain
+            ),
+        )
+        project = validated.model_dump()
         project["domain"] = cleaned_domain
         return project
+
+
+def _validate_domain(project: Project, expected_domain: str) -> None:
+    if project.domain.casefold() != expected_domain.casefold():
+        raise ValueError(
+            f"Project domain must exactly match '{expected_domain}'."
+        )
             
 
 if __name__ == "__main__":

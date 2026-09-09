@@ -7,6 +7,7 @@ from generator.llm import LLMClient
 from generator.project_generator import ProjectGenerator
 from generator.story_generator import StoryGenerator
 from generator.testcase_generator import TestCaseGenerator
+from models import SyntheticDataset
 from utils.helpers import require_string
 
 
@@ -147,7 +148,7 @@ class SyntheticDataEngine:
             test_cases,
             bugs,
         )
-        return {
+        dataset = {
             "project": project,
             "epics": epics,
             "features": features,
@@ -157,6 +158,7 @@ class SyntheticDataEngine:
             "bugs": bugs,
             "traceability": traceability,
         }
+        return SyntheticDataset.model_validate(dataset).model_dump()
 
     @staticmethod
     def _add_acceptance_criteria(

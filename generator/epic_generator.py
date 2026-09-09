@@ -1,11 +1,9 @@
 import json
 
 from generator.llm import LLMClient
-from utils.helpers import (
-	parse_collection_response,
-	require_string,
-	require_string_list,
-)
+from generator.validation import generate_validated, require_exact_count
+from models import EpicsResponse
+from utils.helpers import require_string, require_string_list
 from utils.prompt_loader import load_prompt
 
 
@@ -30,26 +28,17 @@ class EpicGenerator:
 			objectives=json.dumps(objectives, indent=2, ensure_ascii=False),
 			epic_count=str(count),
 		)
-		response = self.llm_client.generate(prompt, json_output=True)
-		epics = parse_collection_response(
-			response,
+		validated = generate_validated(
+			self.llm_client,
+			prompt,
+			EpicsResponse,
 			"epics",
-			{"id", "title", "description", "business_value", "priority"},
+			semantic_validator=lambda response: require_exact_count(
+				response, "epics", count, "epics"
+			),
 		)
-		if len(epics) != count:
-			raise ValueError(f"Expected {count} epics, but the LLM returned {len(epics)}.")
+		epics = [epic.model_dump() for epic in validated.epics]
 
 		for index, epic in enumerate(epics, start=1):
 			epic["id"] = f"EPIC-{index:03d}"
-			require_string(epic, "title", "Epic")
-			require_string(epic, "description", "Epic")
-			require_string(epic, "business_value", "Epic")
-			_validate_priority(epic, "Epic")
 		return {"epics": epics}
-
-
-def _validate_priority(artifact: dict[str, object], artifact_name: str) -> None:
-	priority = require_string(artifact, "priority", artifact_name).title()
-	if priority not in {"High", "Medium", "Low"}:
-		raise ValueError(f"{artifact_name} priority must be High, Medium, or Low.")
-	artifact["priority"] = priority

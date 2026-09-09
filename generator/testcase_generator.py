@@ -1,12 +1,9 @@
 import json
-from typing import cast
 
 from generator.llm import LLMClient
-from utils.helpers import (
-	parse_collection_response,
-	require_string,
-	require_string_list,
-)
+from generator.validation import generate_validated, require_exact_count
+from models import TestCasesResponse
+from utils.helpers import require_string, require_string_list
 from utils.prompt_loader import load_prompt
 
 
@@ -42,85 +39,47 @@ class TestCaseGenerator:
 			),
 			test_case_count=str(requested_count),
 		)
-		response = self.llm_client.generate(prompt, json_output=True)
-		test_cases = parse_collection_response(
-			response,
-			"test_cases",
-			{
-				"id",
-				"story_id",
-				"title",
-				"preconditions",
-				"steps",
-				"expected_result",
-				"acceptance_criteria",
-				"priority",
-				"test_type",
-			},
+		validated = generate_validated(
+			self.llm_client,
+			prompt,
+			TestCasesResponse,
+			"test cases",
+			semantic_validator=lambda response: _validate_response(
+				response, requested_count, acceptance_criteria
+			),
 		)
-		if len(test_cases) != requested_count:
-			raise ValueError(
-				"Expected "
-				f"{requested_count} test cases, but the LLM returned "
-				f"{len(test_cases)}."
-			)
+		test_cases = [test_case.model_dump() for test_case in validated.test_cases]
 		criteria_lookup = {
 			criterion.casefold(): criterion for criterion in acceptance_criteria
 		}
-		covered_criteria: set[str] = set()
 
 		for offset, test_case in enumerate(test_cases):
 			test_case["id"] = f"TC-{start_index + offset:03d}"
 			test_case["story_id"] = story_id
-			require_string(test_case, "title", "Test case")
-			_validate_optional_string_list(test_case, "preconditions")
-			_validate_steps(test_case)
-			require_string(test_case, "expected_result", "Test case")
 			criterion = require_string(
 				test_case, "acceptance_criteria", "Test case"
 			)
-			canonical_criterion = criteria_lookup.get(criterion.casefold())
-			if canonical_criterion is None:
-				raise ValueError(
-					"A test case references an unknown acceptance criterion."
-				)
-			test_case["acceptance_criteria"] = canonical_criterion
-			covered_criteria.add(canonical_criterion)
-
-			priority = require_string(test_case, "priority", "Test case").title()
-			if priority not in {"High", "Medium", "Low"}:
-				raise ValueError("Test-case priority must be High, Medium, or Low.")
-			test_case["priority"] = priority
-			test_type = require_string(test_case, "test_type", "Test case").title()
-			if test_type not in {"Positive", "Negative", "Boundary"}:
-				raise ValueError(
-					"Test type must be Positive, Negative, or Boundary."
-				)
-			test_case["test_type"] = test_type
-
-		if covered_criteria != set(acceptance_criteria):
-			raise ValueError("The generated test cases do not cover every criterion.")
+			test_case["acceptance_criteria"] = criteria_lookup[criterion.casefold()]
+			for index, step in enumerate(test_case["steps"], start=1):
+				step["step_number"] = index
 		return {"test_cases": test_cases}
 
 
-def _validate_optional_string_list(
-	artifact: dict[str, object], field_name: str
+def _validate_response(
+	response: TestCasesResponse,
+	expected_count: int,
+	acceptance_criteria: list[str],
 ) -> None:
-	values = artifact.get(field_name)
-	if not isinstance(values, list):
-		raise ValueError(f"Test case '{field_name}' must be an array.")
-	if any(not isinstance(value, str) or not value.strip() for value in values):
-		raise ValueError(f"Every test case '{field_name}' value must be text.")
-	artifact[field_name] = [cast(str, value).strip() for value in values]
-
-
-def _validate_steps(test_case: dict[str, object]) -> None:
-	steps = test_case.get("steps")
-	if not isinstance(steps, list) or not steps:
-		raise ValueError("A test case must contain at least one step.")
-	for index, step in enumerate(steps, start=1):
-		if not isinstance(step, dict):
-			raise ValueError("Every test step must be a JSON object.")
-		step["step_number"] = index
-		require_string(step, "action", "Test step")
-		require_string(step, "expected_result", "Test step")
+	require_exact_count(response, "test_cases", expected_count, "test cases")
+	valid_criteria = {criterion.casefold() for criterion in acceptance_criteria}
+	covered_criteria = {
+		test_case.acceptance_criteria.casefold()
+		for test_case in response.test_cases
+	}
+	unknown_criteria = covered_criteria.difference(valid_criteria)
+	if unknown_criteria:
+		raise ValueError(
+			"Every test case must copy one supplied acceptance criterion exactly."
+		)
+	if covered_criteria != valid_criteria:
+		raise ValueError("The test cases must cover every acceptance criterion.")

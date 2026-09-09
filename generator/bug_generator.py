@@ -1,11 +1,9 @@
 import json
 
 from generator.llm import LLMClient
-from utils.helpers import (
-	parse_collection_response,
-	require_string,
-	require_string_list,
-)
+from generator.validation import generate_validated, require_exact_count
+from models import BugsResponse
+from utils.helpers import require_string
 from utils.prompt_loader import load_prompt
 
 
@@ -47,45 +45,19 @@ class BugGenerator:
 			actual_result=actual_result.strip(),
 			bug_count=str(count),
 		)
-		response = self.llm_client.generate(prompt, json_output=True)
-		bugs = parse_collection_response(
-			response,
+		validated = generate_validated(
+			self.llm_client,
+			prompt,
+			BugsResponse,
 			"bugs",
-			{
-				"id",
-				"story_id",
-				"test_case_id",
-				"title",
-				"description",
-				"steps_to_reproduce",
-				"expected_result",
-				"actual_result",
-				"severity",
-				"priority",
-			},
+			semantic_validator=lambda response: require_exact_count(
+				response, "bugs", count, "bugs"
+			),
 		)
-		if len(bugs) != count:
-			raise ValueError(
-				f"Expected {count} bugs, but the LLM returned {len(bugs)}."
-			)
+		bugs = [bug.model_dump() for bug in validated.bugs]
 
 		for offset, bug in enumerate(bugs):
 			bug["id"] = f"BUG-{start_index + offset:03d}"
 			bug["story_id"] = story_id
 			bug["test_case_id"] = test_case_id
-			require_string(bug, "title", "Bug")
-			require_string(bug, "description", "Bug")
-			bug["steps_to_reproduce"] = require_string_list(
-				bug, "steps_to_reproduce", "Bug"
-			)
-			require_string(bug, "expected_result", "Bug")
-			require_string(bug, "actual_result", "Bug")
-			severity = require_string(bug, "severity", "Bug").title()
-			if severity not in {"Critical", "High", "Medium", "Low"}:
-				raise ValueError("Bug severity is invalid.")
-			bug["severity"] = severity
-			priority = require_string(bug, "priority", "Bug").title()
-			if priority not in {"High", "Medium", "Low"}:
-				raise ValueError("Bug priority is invalid.")
-			bug["priority"] = priority
 		return {"bugs": bugs}
