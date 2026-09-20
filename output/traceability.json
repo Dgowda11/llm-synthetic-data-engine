@@ -1,0 +1,30 @@
+{
+  "traceability": [
+    {
+      "epic_id": "EPIC-001",
+      "feature_id": "FEATURE-001",
+      "story_id": "US-001",
+      "acceptance_criteria_ids": [
+        "AC-001",
+        "AC-002",
+        "AC-003",
+        "AC-004",
+        "AC-005"
+      ],
+      "test_case_ids": [
+        "TC-001",
+        "TC-002",
+        "TC-003",
+        "TC-004",
+        "TC-005"
+      ],
+      "bug_links": [
+        {
+          "bug_id": "BUG-001",
+          "test_case_id": "TC-001"
+        }
+      ]
+    }
+  ],
+  "unresolved_references": []
+}

@@ -71,7 +71,9 @@ class Story(PrioritizedModel):
     feature_id: NonEmptyString
     title: NonEmptyString
     description: NonEmptyString
-    acceptance_criteria: list[NonEmptyString] = Field(min_length=1)
+    acceptance_criteria: list[NonEmptyString] = Field(
+        min_length=1, max_length=5
+    )
     acceptance_criteria_ids: list[NonEmptyString] = Field(default_factory=list)
     story_points: int = Field(gt=0)
 
@@ -110,7 +112,7 @@ class TestCase(PrioritizedModel):
 
 
 class TestCasesResponse(ArtifactModel):
-    test_cases: list[TestCase] = Field(min_length=1)
+    test_cases: list[TestCase] = Field(min_length=1, max_length=5)
 
 
 class Bug(PrioritizedModel):
@@ -131,7 +133,7 @@ class Bug(PrioritizedModel):
 
 
 class BugsResponse(ArtifactModel):
-    bugs: list[Bug] = Field(min_length=1)
+    bugs: list[Bug] = Field(min_length=1, max_length=5)
 
 
 class BugLink(ArtifactModel):

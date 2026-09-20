@@ -1,19 +1,19 @@
 {
-  "name": "AutoConnect Fleet Management System",
-  "description": "The AutoConnect Fleet Management System enables organizations to monitor, maintain, and optimize their vehicle fleets in real time. It integrates telematics, predictive maintenance, and driver behavior analytics to improve operational efficiency. The platform supports multiple vehicle types and provides a unified dashboard for analytics and reporting.",
-  "domain": "Automobiles",
+  "name": "Arcane Quest Multiplayer Platform",
+  "description": "Arcane Quest is a cross‑platform multiplayer game that blends real‑time strategy with immersive storytelling. The platform will support dynamic matchmaking, in‑game economies, and community-driven content creation. It aims to deliver a seamless, low‑latency experience for players worldwide.",
+  "domain": "Gaming",
   "objectives": [
-    "Provide real-time GPS tracking and monitoring of fleet vehicles.",
-    "Automate maintenance scheduling based on usage and sensor data.",
-    "Generate actionable analytics on fuel consumption and driver efficiency.",
-    "Enable mobile access for drivers and managers via a responsive application.",
-    "Integrate with existing ERP and accounting systems for expense tracking."
+    "Provide real‑time, low‑latency multiplayer gameplay across PC, console, and mobile.",
+    "Enable a robust in‑game economy with secure micro‑transactions and item trading.",
+    "Facilitate community content creation through mod support and user‑generated levels.",
+    "Ensure high availability and scalability to support millions of concurrent players.",
+    "Deliver comprehensive analytics for player engagement and monetization insights."
   ],
   "success_criteria": [
-    "Achieve at least 95% system uptime for critical tracking services.",
-    "Reduce average vehicle downtime by 20% through predictive maintenance.",
-    "Increase fuel efficiency by 10% across the fleet.",
-    "Provide role-based access to over 500 concurrent users with sub-second response times.",
-    "Generate monthly reports that are accurate within 1% of actual mileage."
+    "Latency remains below 50 ms for 95% of all matches.",
+    "Monthly active users exceed 2 million within six months of launch.",
+    "In‑game economy transactions process with 99.8% success rate.",
+    "System uptime is 99.95% over any 30‑day period.",
+    "Player retention rate at 30 days is above 60%."
   ]
 }

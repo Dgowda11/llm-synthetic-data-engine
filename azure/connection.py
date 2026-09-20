@@ -13,9 +13,7 @@ class AzureDevOpsClient:
         pat: str,
         timeout: float = 30,
     ) -> None:
-        self.organization_url = organization_url.strip().rstrip("/")
-        if not self.organization_url:
-            raise ValueError("Azure DevOps organization URL cannot be empty.")
+        self.organization_url = _validate_organization_url(organization_url)
         if not pat.strip():
             raise ValueError("Azure DevOps PAT cannot be empty.")
         if timeout <= 0:
@@ -84,4 +82,27 @@ class AzureDevOpsClient:
         if not isinstance(result, dict):
             raise RuntimeError("Azure DevOps returned an unexpected response shape.")
         return result
+
+
+def _validate_organization_url(organization_url: str) -> str:
+    value = organization_url.strip().rstrip("/")
+    if not value:
+        raise ValueError("Azure DevOps organization URL cannot be empty.")
+
+    parsed = urlparse(value)
+    if parsed.scheme != "https" or not parsed.netloc:
+        raise ValueError("Azure DevOps organization URL must be a valid HTTPS URL.")
+
+    path_parts = [part for part in parsed.path.split("/") if part]
+    if parsed.netloc.casefold() == "dev.azure.com":
+        if len(path_parts) != 1:
+            raise ValueError(
+                "AZURE_DEVOPS_ORG must be the organization root, for example "
+                "https://dev.azure.com/my-organization, without a project path."
+            )
+    elif path_parts:
+        raise ValueError(
+            "Legacy Azure DevOps organization URLs must not include a project path."
+        )
+    return value
     

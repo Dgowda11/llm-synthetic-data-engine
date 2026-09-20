@@ -14,15 +14,16 @@ The primary goal of this project is to create synthetic yet realistic software d
 
 The generator accepts a **business domain** (for example, Banking, Insurance, Healthcare, or E-Commerce) and automatically creates a structured project hierarchy.
 
+# End Results
+![alt text](image.png)
 ---
-
 # Project Workflow
 
 ```text
 User Input (Business Domain)
             │
             ▼
-            NVIDIA NIM LLM
+            LLMs
             │
             ▼
  Generate Azure DevOps Artifacts
@@ -92,7 +93,7 @@ Project
 SyntheticAzureDevOpsGenerator/
 │
 ├── app.py
-├── config.py
+├── settings.py
 ├── requirements.txt
 ├── .env
 │
@@ -180,6 +181,9 @@ LLM_PROVIDER=nvidia
 NVIDIA_API_KEY=your_nvidia_api_key
 NVIDIA_BASE_URL=https://integrate.api.nvidia.com/v1
 NVIDIA_MODEL=meta/llama-3.3-70b-instruct
+LLM_TIMEOUT_SECONDS=180
+LLM_MAX_RETRIES=2
+LOG_LEVEL=INFO
 
 # Optional OpenRouter fallback configuration
 OPENROUTER_API_KEY=your_openrouter_api_key
@@ -214,16 +218,23 @@ Insurance Claim Processing
 
 The application will generate synthetic Azure DevOps artifacts and save them as JSON files.
 
-The default E2E dataset generates 2 Epics, 2 Features per Epic, 2 User
-Stories per Feature, and at least 3 Test Cases per Story. These counts are
-constructor options on `SyntheticDataEngine` and can be increased after the
-small vertical slice is working reliably with your selected model and limits.
+The free-tier optimized default dataset generates 1 Project, 1 Epic, 1 Feature,
+1 User Story, 3 Test Cases, and 1 Bug. A Story can contain at most 5 Test Cases
+and 5 Bugs. These counts are constructor options on `SyntheticDataEngine`, but
+the caps prevent oversized responses when using free LLM endpoints.
 
 Every LLM response is parsed into a strict Pydantic model. Invalid fields,
 types, enum values, collection counts, or acceptance-criteria coverage trigger
 a bounded correction request. The complete dataset is validated again for
 unique IDs and parent-child references before any file is saved or Azure API
 write is attempted.
+
+When using `openrouter/free`, the router can select models with different output
+limits. Test Cases are therefore generated in small batches, one acceptance
+criterion at a time, instead of requesting one large nested response. Keeping
+the output limit at 4096 is normally sufficient for these batches. For more
+predictable behavior without a paid model, configure a specific `:free` model
+instead of the rotating `openrouter/free` router.
 
 ---
 

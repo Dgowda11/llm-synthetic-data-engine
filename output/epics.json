@@ -1,0 +1,11 @@
+{
+  "epics": [
+    {
+      "priority": "High",
+      "id": "EPIC-001",
+      "title": "Real-Time Multiplayer Core",
+      "description": "Develop the core networking and matchmaking infrastructure to support low-latency, cross-platform multiplayer gameplay, ensuring seamless player connections, dynamic matchmaking, and robust session management.",
+      "business_value": "Provides a high-quality, engaging player experience that drives retention, increases in-game purchases, and supports scalable growth across PC, console, and mobile platforms."
+    }
+  ]
+}

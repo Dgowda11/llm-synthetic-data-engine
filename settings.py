@@ -18,3 +18,27 @@ def get_env(var_name: str, default: str) -> str:
         return default
     return value.strip()
 
+
+def get_positive_float_env(var_name: str, default: float) -> float:
+    """Get a positive floating-point environment setting."""
+    raw_value = get_env(var_name, str(default))
+    try:
+        value = float(raw_value)
+    except ValueError as error:
+        raise ValueError(f"Environment variable '{var_name}' must be a number.") from error
+    if value <= 0:
+        raise ValueError(f"Environment variable '{var_name}' must be greater than zero.")
+    return value
+
+
+def get_non_negative_int_env(var_name: str, default: int) -> int:
+    """Get a non-negative integer environment setting."""
+    raw_value = get_env(var_name, str(default))
+    try:
+        value = int(raw_value)
+    except ValueError as error:
+        raise ValueError(f"Environment variable '{var_name}' must be an integer.") from error
+    if value < 0:
+        raise ValueError(f"Environment variable '{var_name}' cannot be negative.")
+    return value
+

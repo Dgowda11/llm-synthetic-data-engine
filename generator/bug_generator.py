@@ -7,6 +7,9 @@ from utils.helpers import require_string
 from utils.prompt_loader import load_prompt
 
 
+MAX_BUGS_PER_STORY = 5
+
+
 class BugGenerator:
 	def __init__(self, llm_client: LLMClient) -> None:
 		self.llm_client = llm_client
@@ -26,6 +29,10 @@ class BugGenerator:
 			raise ValueError("Actual result cannot be empty.")
 		if count <= 0:
 			raise ValueError("Bug count must be greater than zero.")
+		if count > MAX_BUGS_PER_STORY:
+			raise ValueError(
+				f"Bug count cannot exceed {MAX_BUGS_PER_STORY}."
+			)
 
 		story_id = require_string(story, "id", "Story")
 		test_case_id = require_string(test_case, "id", "Test case")

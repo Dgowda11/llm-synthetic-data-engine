@@ -1,0 +1,26 @@
+{
+  "stories": [
+    {
+      "priority": "High",
+      "id": "US-001",
+      "feature_id": "FEATURE-001",
+      "title": "Real-Time Matchmaking and Session Lifecycle Management",
+      "description": "As a player, I want the platform to match me with opponents in real-time and manage my session lifecycle so that I can enjoy seamless multiplayer experiences across platforms.",
+      "acceptance_criteria": [
+        "The matchmaking engine pairs a player with an opponent within 200 ms of request, regardless of platform.",
+        "A secure peer-to-peer or client-server session is established with mutual authentication before gameplay starts.",
+        "When a player joins, the session state is synchronized to all participants within 100 ms.",
+        "If a player disconnects, the session remains active for up to 30 seconds to allow reconnection; after that, the session terminates gracefully and notifies remaining players.",
+        "The system logs all session lifecycle events (join, leave, reconnect, termination) with timestamps for audit."
+      ],
+      "acceptance_criteria_ids": [
+        "AC-001",
+        "AC-002",
+        "AC-003",
+        "AC-004",
+        "AC-005"
+      ],
+      "story_points": 5
+    }
+  ]
+}

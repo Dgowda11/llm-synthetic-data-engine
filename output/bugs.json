@@ -1,0 +1,24 @@
+{
+  "bugs": [
+    {
+      "priority": "High",
+      "id": "BUG-001",
+      "story_id": "US-001",
+      "test_case_id": "TC-001",
+      "title": "Matchmaking latency exceeds 200 ms across platforms",
+      "description": "When a player initiates a matchmaking request, the server response time consistently exceeds the 200 ms threshold, causing the matchmaking feature to fail the performance requirement. This latency issue is observed on PC, console, and mobile platforms, leading to a poor user experience and potential matchmaking queue buildup.",
+      "steps_to_reproduce": [
+        "Player initiates a matchmaking request",
+        "Record the current timestamp T1 before sending the request",
+        "Wait for the matchmaking engine to return a match response",
+        "Record the current timestamp T2 after receiving the match response",
+        "Calculate the time difference (T2 - T1) in milliseconds",
+        "Verify that the time difference is less than or equal to 200 ms",
+        "Verify that the matched opponent is from any platform (PC, console, mobile)"
+      ],
+      "expected_result": "Player is matched with an opponent within 200 ms regardless of platform",
+      "actual_result": "The action failed and did not produce the expected result: Player is matched with an opponent within 200 ms regardless of platform",
+      "severity": "High"
+    }
+  ]
+}

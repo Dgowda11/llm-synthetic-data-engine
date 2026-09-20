@@ -15,7 +15,7 @@ from openai import(
 class LLMClient:
     def __init__(self,
                  temperature:float=1,
-                 max_tokens:int=4000,
+                 max_tokens:int=4096,
                  json_attempts: int = 3,) -> None:
         self.provider = settings.get_env("LLM_PROVIDER", "nvidia").lower()
         api_key, base_url, self.model = _load_provider_config(self.provider)
@@ -30,7 +30,18 @@ class LLMClient:
         self.json_attempts = json_attempts
         if json_attempts <= 0:
             raise ValueError("JSON attempts must be a positive integer.")
-        self.client = OpenAI(api_key=api_key, base_url=base_url, timeout=30)
+        self.timeout_seconds = settings.get_positive_float_env(
+            "LLM_TIMEOUT_SECONDS", 180
+        )
+        self.max_retries = settings.get_non_negative_int_env(
+            "LLM_MAX_RETRIES", 2
+        )
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url=base_url,
+            timeout=self.timeout_seconds,
+            max_retries=self.max_retries,
+        )
         
 
     def generate(self, prompt: str, json_output: bool = False) -> str:
@@ -49,7 +60,10 @@ class LLMClient:
             except RateLimitError as error:
                 raise RuntimeError(f"Rate limit error: {error}") from error
             except APITimeoutError as error:
-                raise RuntimeError(f"API timeout error: {error}") from error
+                raise RuntimeError(
+                    f"{self.provider.title()} API timed out after "
+                    f"{self.timeout_seconds:g} seconds per attempt."
+                ) from error
             except APIConnectionError as error:
                 raise RuntimeError(f"API connection error: {error}") from error
             except APIStatusError as error:
@@ -59,7 +73,9 @@ class LLMClient:
 
             if response.choices[0].finish_reason == "length":
                 raise RuntimeError(
-                    "The model response was truncated because it reached the token limit."
+                    f"{self.provider.title()} model '{self.model}' reached its "
+                    f"{self.max_tokens}-token output limit. Reduce the response scope "
+                    "or choose a free model with a larger output allowance."
                 )
             response_text = response.choices[0].message.content
             if response_text is None or not response_text.strip():

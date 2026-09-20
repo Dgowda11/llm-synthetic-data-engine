@@ -1,0 +1,73 @@
+{
+  "project_operation": {
+    "id": "18dd471a-e182-4ae9-b9d3-c34e0af61145",
+    "status": "succeeded",
+    "url": "https://dev.azure.com/dgowda112000/_apis/operations/18dd471a-e182-4ae9-b9d3-c34e0af61145",
+    "_links": {
+      "self": {
+        "href": "https://dev.azure.com/dgowda112000/_apis/operations/18dd471a-e182-4ae9-b9d3-c34e0af61145"
+      }
+    }
+  },
+  "work_item_upload": {
+    "project": "Arcane Quest Multiplayer Platform",
+    "count": 9,
+    "work_items": [
+      {
+        "synthetic_id": "EPIC-001",
+        "azure_id": 1,
+        "work_item_type": "Epic",
+        "url": "https://dev.azure.com/dgowda112000/92e5ed55-fe0f-4676-ab07-6a583570de15/_apis/wit/workItems/1"
+      },
+      {
+        "synthetic_id": "FEATURE-001",
+        "azure_id": 2,
+        "work_item_type": "Feature",
+        "url": "https://dev.azure.com/dgowda112000/92e5ed55-fe0f-4676-ab07-6a583570de15/_apis/wit/workItems/2"
+      },
+      {
+        "synthetic_id": "US-001",
+        "azure_id": 3,
+        "work_item_type": "User Story",
+        "url": "https://dev.azure.com/dgowda112000/92e5ed55-fe0f-4676-ab07-6a583570de15/_apis/wit/workItems/3"
+      },
+      {
+        "synthetic_id": "TC-001",
+        "azure_id": 4,
+        "work_item_type": "Test Case",
+        "url": "https://dev.azure.com/dgowda112000/92e5ed55-fe0f-4676-ab07-6a583570de15/_apis/wit/workItems/4"
+      },
+      {
+        "synthetic_id": "TC-002",
+        "azure_id": 5,
+        "work_item_type": "Test Case",
+        "url": "https://dev.azure.com/dgowda112000/92e5ed55-fe0f-4676-ab07-6a583570de15/_apis/wit/workItems/5"
+      },
+      {
+        "synthetic_id": "TC-003",
+        "azure_id": 6,
+        "work_item_type": "Test Case",
+        "url": "https://dev.azure.com/dgowda112000/92e5ed55-fe0f-4676-ab07-6a583570de15/_apis/wit/workItems/6"
+      },
+      {
+        "synthetic_id": "TC-004",
+        "azure_id": 7,
+        "work_item_type": "Test Case",
+        "url": "https://dev.azure.com/dgowda112000/92e5ed55-fe0f-4676-ab07-6a583570de15/_apis/wit/workItems/7"
+      },
+      {
+        "synthetic_id": "TC-005",
+        "azure_id": 8,
+        "work_item_type": "Test Case",
+        "url": "https://dev.azure.com/dgowda112000/92e5ed55-fe0f-4676-ab07-6a583570de15/_apis/wit/workItems/8"
+      },
+      {
+        "synthetic_id": "BUG-001",
+        "azure_id": 9,
+        "work_item_type": "Bug",
+        "url": "https://dev.azure.com/dgowda112000/92e5ed55-fe0f-4676-ab07-6a583570de15/_apis/wit/workItems/9"
+      }
+    ],
+    "status": "succeeded"
+  }
+}

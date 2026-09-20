@@ -13,6 +13,7 @@ Generate User Stories for the provided Feature.
 Generate exactly **$story_count User Stories**.
 
 Each User Story must include Acceptance Criteria.
+Include between 2 and 5 concise, independently testable Acceptance Criteria.
 
 ---
 

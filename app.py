@@ -8,9 +8,11 @@ from generator.exporter import save_dataset, save_json
 from generator.llm import LLMClient
 from generator.pipeline import SyntheticDataEngine
 from utils.helpers import require_string
+from utils.logger import configure_logging
 
 
 OUTPUT_DIRECTORY = Path(__file__).resolve().parent / "output"
+LOGGER = configure_logging()
 
 
 def run(domain: str) -> dict[str, object]:
@@ -19,24 +21,27 @@ def run(domain: str) -> dict[str, object]:
 	process_template_id = settings.get_required_env(
 		"AZURE_DEVOPS_PROCESS_TEMPLATE_ID"
 	)
+	azure_client = AzureDevOpsClient(
+		organization_url=organization_url,
+		pat=azure_pat,
+	)
+	LOGGER.info("Generating synthetic dataset for domain '%s'", domain.strip())
 	llm_client = LLMClient()
 	dataset = SyntheticDataEngine(llm_client).generate(domain)
 	saved_paths = save_dataset(dataset, OUTPUT_DIRECTORY)
+	LOGGER.info("Validated and saved generated dataset")
 
 	project = dataset.get("project")
 	if not isinstance(project, dict):
 		raise ValueError("Generated dataset does not contain a project object.")
 	project_name = require_string(project, "name", "Project")
 
-	azure_client = AzureDevOpsClient(
-		organization_url=organization_url,
-		pat=azure_pat,
-	)
 	project_uploader = AzureProjectUploader(
 		azure_client,
 		process_template_id=process_template_id,
 	)
 	project_operation = project_uploader.create_project(project)
+	LOGGER.info("Created Azure DevOps project '%s'", project_name)
 	upload_path = OUTPUT_DIRECTORY / "azure_upload.json"
 
 	def save_upload_progress(progress: dict[str, object]) -> None:
@@ -55,6 +60,10 @@ def run(domain: str) -> dict[str, object]:
 	).upload(dataset)
 	work_item_upload["status"] = "succeeded"
 	save_upload_progress(work_item_upload)
+	LOGGER.info(
+		"Uploaded %s linked Azure DevOps work items",
+		work_item_upload["count"],
+	)
 	return {
 		"dataset": dataset,
 		"saved_paths": {

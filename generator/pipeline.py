@@ -1,12 +1,15 @@
 from typing import cast
 
-from generator.bug_generator import BugGenerator
+from generator.bug_generator import BugGenerator, MAX_BUGS_PER_STORY
 from generator.epic_generator import EpicGenerator
 from generator.feature_generator import FeatureGenerator
 from generator.llm import LLMClient
 from generator.project_generator import ProjectGenerator
 from generator.story_generator import StoryGenerator
-from generator.testcase_generator import TestCaseGenerator
+from generator.testcase_generator import (
+    MAX_TEST_CASES_PER_STORY,
+    TestCaseGenerator,
+)
 from models import SyntheticDataset
 from utils.helpers import require_string
 
@@ -15,9 +18,9 @@ class SyntheticDataEngine:
     def __init__(
         self,
         llm_client: LLMClient,
-        epic_count: int = 2,
-        features_per_epic: int = 2,
-        stories_per_feature: int = 2,
+        epic_count: int = 1,
+        features_per_epic: int = 1,
+        stories_per_feature: int = 1,
         test_cases_per_story: int = 3,
         bug_sources_per_story: int = 1,
         bugs_per_source: int = 1,
@@ -31,8 +34,16 @@ class SyntheticDataEngine:
         }
         if any(value <= 0 for value in counts.values()):
             raise ValueError("Artifact counts must be greater than zero.")
+        if test_cases_per_story > MAX_TEST_CASES_PER_STORY:
+            raise ValueError(
+                f"Test Cases per Story cannot exceed {MAX_TEST_CASES_PER_STORY}."
+            )
         if bug_sources_per_story < 0:
             raise ValueError("Bug sources per story cannot be negative.")
+        if bug_sources_per_story * bugs_per_source > MAX_BUGS_PER_STORY:
+            raise ValueError(
+                f"Total Bugs per Story cannot exceed {MAX_BUGS_PER_STORY}."
+            )
         self.project_generator = ProjectGenerator(llm_client)
         self.epic_generator = EpicGenerator(llm_client)
         self.feature_generator = FeatureGenerator(llm_client)

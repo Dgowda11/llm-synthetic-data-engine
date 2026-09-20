@@ -1,0 +1,191 @@
+{
+  "test_cases": [
+    {
+      "priority": "High",
+      "id": "TC-001",
+      "story_id": "US-001",
+      "title": "Real-Time Matchmaking within 200 ms across platforms",
+      "preconditions": [
+        "Player is logged in to the Arcane Quest platform",
+        "Player has a stable internet connection",
+        "At least one opponent is online and available for matchmaking"
+      ],
+      "steps": [
+        {
+          "step_number": 1,
+          "action": "Player initiates a matchmaking request",
+          "expected_result": "Matchmaking request is sent to the server"
+        },
+        {
+          "step_number": 2,
+          "action": "Record the current timestamp T1 before sending the request",
+          "expected_result": "Timestamp T1 is captured"
+        },
+        {
+          "step_number": 3,
+          "action": "Wait for the matchmaking engine to return a match response",
+          "expected_result": "Match response is received from the server"
+        },
+        {
+          "step_number": 4,
+          "action": "Record the current timestamp T2 after receiving the match response",
+          "expected_result": "Timestamp T2 is captured"
+        },
+        {
+          "step_number": 5,
+          "action": "Calculate the time difference (T2 - T1) in milliseconds",
+          "expected_result": "Time difference is computed"
+        },
+        {
+          "step_number": 6,
+          "action": "Verify that the time difference is less than or equal to 200 ms",
+          "expected_result": "Time difference is <= 200 ms"
+        },
+        {
+          "step_number": 7,
+          "action": "Verify that the matched opponent is from any platform (PC, console, mobile)",
+          "expected_result": "Opponent platform is accepted regardless of platform"
+        }
+      ],
+      "expected_result": "Player is matched with an opponent within 200 ms regardless of platform",
+      "acceptance_criteria": "The matchmaking engine pairs a player with an opponent within 200 ms of request, regardless of platform.",
+      "acceptance_criteria_id": "AC-001",
+      "test_type": "Positive"
+    },
+    {
+      "priority": "High",
+      "id": "TC-002",
+      "story_id": "US-001",
+      "title": "Attempt to establish session without mutual authentication",
+      "preconditions": [
+        "Player is logged in with an expired or invalid authentication token.",
+        "Opponent is online but has not provided mutual authentication credentials."
+      ],
+      "steps": [
+        {
+          "step_number": 1,
+          "action": "Player initiates matchmaking request to the server.",
+          "expected_result": "Matchmaking request is sent to the server."
+        },
+        {
+          "step_number": 2,
+          "action": "Server attempts to establish a secure session with the opponent using the provided authentication token.",
+          "expected_result": "Authentication handshake fails due to missing or invalid credentials."
+        },
+        {
+          "step_number": 3,
+          "action": "Server rejects the session establishment and displays an error message to the player.",
+          "expected_result": "No secure peer-to-peer or client-server session is established and gameplay does not start."
+        }
+      ],
+      "expected_result": "Session establishment fails and gameplay does not start due to lack of mutual authentication.",
+      "acceptance_criteria": "A secure peer-to-peer or client-server session is established with mutual authentication before gameplay starts.",
+      "acceptance_criteria_id": "AC-002",
+      "test_type": "Negative"
+    },
+    {
+      "priority": "High",
+      "id": "TC-003",
+      "story_id": "US-001",
+      "title": "Boundary Test for Session State Synchronization Timing",
+      "preconditions": [
+        "Player A is connected to the matchmaking service and ready to join a session"
+      ],
+      "steps": [
+        {
+          "step_number": 1,
+          "action": "Player A initiates a join request to the matchmaking service.",
+          "expected_result": "Join request is accepted and session creation is initiated."
+        },
+        {
+          "step_number": 2,
+          "action": "Measure the elapsed time from the join request to the receipt of the session state synchronization event for all participants.",
+          "expected_result": "Elapsed time is recorded."
+        },
+        {
+          "step_number": 3,
+          "action": "Verify that the recorded elapsed time is less than or equal to 100 milliseconds.",
+          "expected_result": "Session state synchronization occurs within 100 ms."
+        }
+      ],
+      "expected_result": "All participants receive the synchronized session state within 100 ms of a player joining.",
+      "acceptance_criteria": "When a player joins, the session state is synchronized to all participants within 100 ms.",
+      "acceptance_criteria_id": "AC-003",
+      "test_type": "Boundary"
+    },
+    {
+      "priority": "High",
+      "id": "TC-004",
+      "story_id": "US-001",
+      "title": "Verify session remains active for 30 seconds after player disconnects and terminates gracefully thereafter",
+      "preconditions": [
+        "All players are logged into the Arcane Quest Multiplayer Platform.",
+        "A multiplayer session with at least three players is active.",
+        "Network conditions are stable for the duration of the test."
+      ],
+      "steps": [
+        {
+          "step_number": 1,
+          "action": "Player A initiates a disconnect from the session.",
+          "expected_result": "Player A is marked as disconnected but the session remains active."
+        },
+        {
+          "step_number": 2,
+          "action": "Wait for 20 seconds.",
+          "expected_result": "The session continues to run and other players can still play."
+        },
+        {
+          "step_number": 3,
+          "action": "Player A attempts to reconnect to the session.",
+          "expected_result": "Player A successfully reconnects and resumes gameplay without loss of progress."
+        },
+        {
+          "step_number": 4,
+          "action": "Player A disconnects again from the session.",
+          "expected_result": "Player A is marked as disconnected but the session remains active."
+        },
+        {
+          "step_number": 5,
+          "action": "Wait for 35 seconds.",
+          "expected_result": "The session terminates gracefully and all remaining players receive a notification that the session has ended due to a player disconnect."
+        }
+      ],
+      "expected_result": "The session remains active for up to 30 seconds after a player disconnects, allowing reconnection, and terminates gracefully with notifications to remaining players after the timeout.",
+      "acceptance_criteria": "If a player disconnects, the session remains active for up to 30 seconds to allow reconnection; after that, the session terminates gracefully and notifies remaining players.",
+      "acceptance_criteria_id": "AC-004",
+      "test_type": "Positive"
+    },
+    {
+      "priority": "High",
+      "id": "TC-005",
+      "story_id": "US-001",
+      "title": "Negative: Verify system fails to log join event when logging service is down",
+      "preconditions": [
+        "Logging service is intentionally disabled or unreachable",
+        "Player is logged into the platform",
+        "Player has a valid session ID"
+      ],
+      "steps": [
+        {
+          "step_number": 1,
+          "action": "Player initiates a join request to a new session",
+          "expected_result": "Join request is sent to the matchmaking service"
+        },
+        {
+          "step_number": 2,
+          "action": "Check the logging service for a new log entry corresponding to the join event",
+          "expected_result": "No log entry is found"
+        },
+        {
+          "step_number": 3,
+          "action": "Observe system UI for any error messages",
+          "expected_result": "An error message indicating logging failure is displayed"
+        }
+      ],
+      "expected_result": "The system should log the join event with a timestamp; if it does not, the test fails.",
+      "acceptance_criteria": "The system logs all session lifecycle events (join, leave, reconnect, termination) with timestamps for audit.",
+      "acceptance_criteria_id": "AC-005",
+      "test_type": "Negative"
+    }
+  ]
+}

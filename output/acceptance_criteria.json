@@ -1,0 +1,29 @@
+{
+  "acceptance_criteria": [
+    {
+      "id": "AC-001",
+      "story_id": "US-001",
+      "text": "The matchmaking engine pairs a player with an opponent within 200 ms of request, regardless of platform."
+    },
+    {
+      "id": "AC-002",
+      "story_id": "US-001",
+      "text": "A secure peer-to-peer or client-server session is established with mutual authentication before gameplay starts."
+    },
+    {
+      "id": "AC-003",
+      "story_id": "US-001",
+      "text": "When a player joins, the session state is synchronized to all participants within 100 ms."
+    },
+    {
+      "id": "AC-004",
+      "story_id": "US-001",
+      "text": "If a player disconnects, the session remains active for up to 30 seconds to allow reconnection; after that, the session terminates gracefully and notifies remaining players."
+    },
+    {
+      "id": "AC-005",
+      "story_id": "US-001",
+      "text": "The system logs all session lifecycle events (join, leave, reconnect, termination) with timestamps for audit."
+    }
+  ]
+}
